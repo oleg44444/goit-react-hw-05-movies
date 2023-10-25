@@ -1,17 +1,19 @@
-import { useEffect, useState } from 'react'; // Видалено дубльований імпорт
-import { useParams } from 'react-router-dom';
+import { useRef, useEffect, useState } from 'react';
+import { useParams, Link, Outlet, useLocation } from 'react-router-dom';
 import { fetchMovieData } from 'API/API';
 
 const MovieDetails = () => {
   const { movieId } = useParams();
-  const [movie, setMovie] = useState(null); // Змінено початковий стан на null
+  const [movie, setMovie] = useState(null);
+  const location = useLocation();
+  const backLocationRef = useRef(location.state?.from ?? '/movies');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const movieData = await fetchMovieData(movieId);
         setMovie(movieData);
-        console.log(movieData); // Додано виведення даних про фільм після завантаження
+        console.log(movieData);
       } catch (error) {
         console.error(error);
       }
@@ -19,10 +21,10 @@ const MovieDetails = () => {
 
     fetchData();
   }, [movieId]);
-  console.log(movie);
 
   return (
     <div>
+      <Link to={backLocationRef.current}>Go BACK</Link>
       {movie ? (
         <div>
           <img
@@ -39,12 +41,21 @@ const MovieDetails = () => {
               <li key={genre.id}>{genre.name}</li>
             ))}
           </ul>
-          <p>{}</p>
+
           <ul>
             Additional information
-            <li>Cast</li>
-            <li>Reviews</li>
+            <li>
+              <Link to="cast" state={{ from: location }}>
+                Cast
+              </Link>
+            </li>
+            <li>
+              <Link to="reviews" state={{ from: location }}>
+                Reviews
+              </Link>
+            </li>
           </ul>
+          <Outlet />
         </div>
       ) : (
         <p>Loading...</p>
