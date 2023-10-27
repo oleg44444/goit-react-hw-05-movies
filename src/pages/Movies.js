@@ -1,41 +1,45 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { fetchSearchFilms } from 'API/API';
 
 const Movies = () => {
+  const [searchResults, setSearchResults] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('query') ?? '';
-  const [searchResults, setSearchResults] = useState([]); // Виправлено ім'я стейту
 
-  const onChangeValue = e => {
-    const inputValue = e.target.value;
-    if (inputValue !== '') {
-      setSearchParams({ query: inputValue });
-    } else {
-      setSearchParams({});
-    }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetchSearchFilms(query);
+        setSearchResults(response.results);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, [query]);
+
+  const updateQueryString = e => {
+    const newQuery = e.target.value.toLowerCase();
+    setSearchParams({ query: newQuery });
   };
 
-  const searchFilms = async () => {
-    try {
-      const responce = await fetchSearchFilms(query);
-      setSearchResults(responce.results);
-    } catch (error) {
-      console.log(error);
+  const onSubmitForm = e => {
+    e.preventDefault();
+    if (query.trim() === '') {
+      alert('Введіть значення!!!');
+    } else {
+      setSearchParams({ query: query });
     }
   };
 
   return (
     <div>
-      <input
-        type="text"
-        value={query}
-        onChange={onChangeValue}
-        placeholder="Enter a movie title"
-      />
-      <button className="button" onClick={searchFilms}>
-        Search
-      </button>
+      <form onSubmit={onSubmitForm}>
+        <input type="text" value={query} onChange={updateQueryString}></input>
+        <button className="submit">Пошук</button>
+      </form>
 
       {searchResults.length > 0 ? (
         <ul>
@@ -43,14 +47,13 @@ const Movies = () => {
             <li key={result.id}>
               <Link to={`/movies/${result.id}`}>
                 {result.original_title}
-
-                <p>Release Date: {result.release_date}</p>
+                <p>Дата виходу: {result.release_date}</p>
               </Link>
             </li>
           ))}
         </ul>
       ) : (
-        <p>No results found.</p>
+        <p>Результати не знайдено.</p>
       )}
     </div>
   );
