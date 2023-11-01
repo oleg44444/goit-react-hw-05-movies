@@ -1,8 +1,16 @@
+import {
+  ReviewList,
+  ReviewContent,
+  ReviewItem,
+  AuthorUsername,
+  NoReviewsMessage,
+  ReviewsContainer,
+} from './Reviews.styled.js';
 import { fetchReviews } from 'API/API';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-export const Reviews = () => {
+const Reviews = () => {
   const { movieId } = useParams();
   const [authors, setAuthors] = useState([]);
 
@@ -19,19 +27,24 @@ export const Reviews = () => {
   }, [movieId]);
 
   return (
-    <div>
+    <ReviewsContainer>
       {authors.length === 0 ? (
-        <p>We don't have any reviews for this movie.</p>
+        <NoReviewsMessage>
+          We don't have any reviews for this movie.
+        </NoReviewsMessage>
       ) : (
-        <ul>
+        <ReviewList>
           {authors.map(author => (
-            <li key={author.author_details.username}>
-              <p>Author: {author.author_details.username}</p>
-              <p>{author.content}</p>
-            </li>
+            <ReviewItem key={author.author_details.username}>
+              <AuthorUsername>
+                Author: {author.author_details.username}
+              </AuthorUsername>
+              <ReviewContent>{author.content}</ReviewContent>
+            </ReviewItem>
           ))}
-        </ul>
+        </ReviewList>
       )}
-    </div>
+    </ReviewsContainer>
   );
 };
+export default Reviews;

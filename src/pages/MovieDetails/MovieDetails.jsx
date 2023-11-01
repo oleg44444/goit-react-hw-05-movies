@@ -1,10 +1,25 @@
 import { useRef, useEffect, useState } from 'react';
-import { useParams, Link, Outlet, useLocation } from 'react-router-dom';
+import { useParams, Outlet, useLocation } from 'react-router-dom';
 import { fetchMovieData } from 'API/API';
-
+import {
+  MovieDetailsContainer,
+  BackLink,
+  MoviePoster,
+  MovieTitle,
+  UserScore,
+  Overview,
+  Genres,
+  Genre,
+  AdditionalInfo,
+  AdditionalInfoItem,
+  CastLink,
+  ReviewsLink,
+  LoadingMessage,
+} from './MovieDetails.styled.js';
 const MovieDetails = () => {
   const { movieId } = useParams();
   const [movie, setMovie] = useState(null);
+
   const location = useLocation();
   const backLocationRef = useRef(location.state?.from ?? '/movies');
 
@@ -23,44 +38,44 @@ const MovieDetails = () => {
   }, [movieId]);
 
   return (
-    <div>
-      <Link to={backLocationRef.current}>Go BACK</Link>
+    <MovieDetailsContainer>
+      <BackLink to={backLocationRef.current}>Go BACK</BackLink>
       {movie ? (
         <div>
-          <img
+          <MoviePoster
             src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
             alt={movie.title}
           />
-          <h1>{movie.title}</h1>
-          <p>User score: {movie.vote_average}</p>
+          <MovieTitle>{movie.title}</MovieTitle>
+          <UserScore>User score: {movie.vote_average}</UserScore>
           <h2>Overview </h2>
-          <p>{movie.overview}</p>
+          <Overview>{movie.overview}</Overview>
           <h3>Genres</h3>
-          <ul>
+          <Genres>
             {movie.genres.map(genre => (
-              <li key={genre.id}>{genre.name}</li>
+              <Genre key={genre.id}>{genre.name}</Genre>
             ))}
-          </ul>
+          </Genres>
 
-          <ul>
+          <AdditionalInfo>
             Additional information
-            <li>
-              <Link to="cast" state={{ from: location }}>
+            <AdditionalInfoItem>
+              <CastLink to="cast" state={{ from: location }}>
                 Cast
-              </Link>
-            </li>
+              </CastLink>
+            </AdditionalInfoItem>
             <li>
-              <Link to="reviews" state={{ from: location }}>
+              <ReviewsLink to="reviews" state={{ from: location }}>
                 Reviews
-              </Link>
+              </ReviewsLink>
             </li>
-          </ul>
+          </AdditionalInfo>
           <Outlet />
         </div>
       ) : (
-        <p>Loading...</p>
+        <LoadingMessage>Loading...</LoadingMessage>
       )}
-    </div>
+    </MovieDetailsContainer>
   );
 };
 

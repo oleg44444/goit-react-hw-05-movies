@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react';
 import { fetchCast } from 'API/API';
 import { useParams } from 'react-router-dom';
-export const Cast = () => {
+import {
+  CastContainer,
+  ActorItem,
+  ActorImage,
+  ActorName,
+  ActorCharacter,
+} from './Cast.styled';
+
+const Cast = () => {
   const { movieId } = useParams();
   const [actors, setActors] = useState([]);
 
@@ -19,17 +27,18 @@ export const Cast = () => {
   }, [movieId]);
 
   return (
-    <ul>
+    <CastContainer>
       {actors.map(actor => (
-        <li key={actor.id}>
-          <img
+        <ActorItem key={actor.id}>
+          <ActorImage
             src={`https://image.tmdb.org/t/p/w200/${actor.profile_path}`}
             alt={actor.name}
           />
-          <p>{actor.name}</p>
-          <p>{actor.character}</p>
-        </li>
+          <ActorName>{actor.name}</ActorName>
+          <ActorCharacter>{actor.character}</ActorCharacter>
+        </ActorItem>
       ))}
-    </ul>
+    </CastContainer>
   );
 };
+export default Cast;
